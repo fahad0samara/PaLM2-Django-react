@@ -1,26 +1,34 @@
-# Node.js dependencies (for front-end)
-/front-end/node_modules/
-/front-end/.env
+# Ignore node_modules in the front-end
+front-end/node_modules/
 
-# Build output (for front-end)
-/front-end/dist/
-/front-end/build/
+# Ignore build output in the front-end
+front-end/build/
 
-# Django (for server)
-/server/venv/
-/server/__pycache__/
-/server/*.pyc
-/server/*.pyo
-/server/*.pyd
-/server/db.sqlite3
-/server/.env
+# Ignore environment-specific files
+front-end/.env
 
-# Logs
-*.log
+# Ignore logs
+front-end/logs
+server/logs
 
-# System files
-.DS_Store
-.idea/
-.vscode/
-*.sublime-workspace
-*.sublime-project
+# Ignore Python virtual environments
+server/Include/
+server/Lib/
+server/Scripts/
+server/pyvenv.cfg
+
+# Ignore Django specific files
+server/myproject/db.sqlite3
+server/myproject/__pycache__/
+server/myproject/static/
+server/myproject/media/
+
+# Ignore VSCode settings
+server/myproject/.vscode/
+
+# Ignore Python cache files
+server/myproject/**/*.pyc
+server/myproject/**/*.pyo
+
+# Ignore coverage reports
+server/coverage/
