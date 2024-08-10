@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat AI</title>
+    <!-- Include Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #f8f8f8;
+            border-right: 1px solid #ddd;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.closed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar h2 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar ul li:hover {
+            background-color: #eaeaea;
+        }
+
+        .sidebar button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar button:hover {
+            background-color: #0056b3;
+        }
+
+        .sidebar .btn-delete-all {
+            background-color: #dc3545;
+        }
+
+        .sidebar .btn-delete-all:hover {
+            background-color: #c82333;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .chat-window {
+            flex-grow: 1;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+
+        .chat-window p {
+            margin: 10px 0;
+            white-space: pre-wrap;
+        }
+
+        .form-group {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .form-group input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .form-group button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: color 0.3s;
+        }
+
+        .btn-icon:hover {
+            color: #0056b3;
+        }
+
+        #toggle-sidebar {
+            position: absolute;
+            top: 10px;
+            right: 1%;
+            z-index: 1000;
+            background: rgb(6, 6, 6);
+            color: #f8f9fa;
+            font-size: 30px;
+
+        }
+    </style>
+    <!-- Include marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+
+<body>
+    <button id="toggle-sidebar" class="btn-icon">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="sidebar">
+        <button id="new-chat" class="btn-icon">
+            <i class="fas fa-comments"></i> New Chat
+        </button>
+        <h2>Conversation History</h2>
+        <ul id="history"></ul>
+        <button id="delete-history" class="btn-icon btn-delete-all">
+            <i class="fas fa-trash-alt"></i> Delete All History
+        </button>
+    </div>
+    <div class="main-content">
+        <div class="chat-window" id="chat-window"></div>
+        <form id="text-form">
+            <div class="form-group">
+                <input type="text" id="prompt" name="prompt" placeholder="Type your message..." required>
+                <button type="submit">Send</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        const chatWindow = document.getElementById('chat-window');
+        const historyList = document.getElementById('history');
+        const deleteHistoryBtn = document.getElementById('delete-history');
+        const newChatBtn = document.getElementById('new-chat');
+        const toggleSidebarBtn = document.getElementById('toggle-sidebar');
+        const sidebar = document.querySelector('.sidebar');
+        let conversations = JSON.parse(localStorage.getItem('conversations')) || [];
+
+        document.getElementById('text-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const prompt = document.getElementById('prompt').value;
+
+            fetch('/api/generate-text/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: `prompt=${encodeURIComponent(prompt)}`
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const responseText = data.text || 'No text generated';
+                    const conversation = { prompt, response: responseText };
+                    conversations.push(conversation);
+                    localStorage.setItem('conversations', JSON.stringify(conversations));
+                    updateChatWindow(conversation);
+                    updateHistory();
+                    document.getElementById('prompt').value = '';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+        function updateChatWindow(conversation) {
+            chatWindow.innerHTML = '';
+            const pPrompt = document.createElement('p');
+            pPrompt.innerHTML = `<strong>You:</strong> ${marked.parse(conversation.prompt)}`;
+            chatWindow.appendChild(pPrompt);
+
+            const pResponse = document.createElement('p');
+            pResponse.innerHTML = `<strong>AI:</strong> ${marked.parse(conversation.response)}`;
+            chatWindow.appendChild(pResponse);
+
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        function updateHistory() {
+            historyList.innerHTML = '';
+            if (conversations.length === 0) {
+                deleteHistoryBtn.style.display = 'none';
+            } else {
+                deleteHistoryBtn.style.display = 'block';
+            }
+
+            conversations.forEach((conv, index) => {
+                const li = document.createElement('li');
+                const title = getConversationTitle(conv.prompt);
+                li.textContent = title;
+                const deleteBtn = document.createElement('button');
+                deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+                deleteBtn.className = 'btn-icon';
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteConversation(index);
+                });
+                li.appendChild(deleteBtn);
+                li.addEventListener('click', () => {
+                    chatWindow.innerHTML = '';
+                    updateChatWindow(conv);
+                });
+                historyList.appendChild(li);
+            });
+        }
+
+        function getConversationTitle(prompt) {
+            const words = prompt.split(' ');
+            return words.slice(0, 3).join(' ') || 'Untitled Conversation';
+        }
+
+        function deleteConversation(index) {
+            conversations.splice(index, 1);
+            localStorage.setItem('conversations', JSON.stringify(conversations));
+            updateHistory();
+            chatWindow.innerHTML = '';
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        toggleSidebarBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('closed');
+            toggleSidebarBtn.innerHTML = sidebar.classList.contains('closed')
+                ? '<i class="fas fa-bars"></i>'
+                : '<i class="fas fa-times"></i>';
+        });
+
+        deleteHistoryBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to delete all conversations?')) {
+                conversations = [];
+                localStorage.removeItem('conversations');
+                updateHistory();
+                chatWindow.innerHTML = '';
+            }
+        });
+
+        newChatBtn.addEventListener('click', () => {
+            chatWindow.innerHTML = '';
+        });
+
+        updateHistory();
+    </script>
+</body>
+
+</html>

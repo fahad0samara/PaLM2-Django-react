@@ -1,0 +1,26 @@
+# Node.js dependencies (for front-end)
+/front-end/node_modules/
+/front-end/.env
+
+# Build output (for front-end)
+/front-end/dist/
+/front-end/build/
+
+# Django (for server)
+/server/venv/
+/server/__pycache__/
+/server/*.pyc
+/server/*.pyo
+/server/*.pyd
+/server/db.sqlite3
+/server/.env
+
+# Logs
+*.log
+
+# System files
+.DS_Store
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
