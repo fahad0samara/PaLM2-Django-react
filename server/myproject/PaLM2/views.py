@@ -22,5 +22,4 @@ class GenerateTextView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-def text_form(request):
-    return render(request, 'generate_text.html')
+

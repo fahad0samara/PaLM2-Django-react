@@ -1,39 +1,191 @@
+/* General styling for the app */
+body, html, #root, .App {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Roboto', sans-serif;
+}
+
 .App {
-  display: subgrid;
-
+  display: flex;
+  height: 100vh;
+  background-color: #f4f4f9;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Sidebar styling */
+.sidebar {
+  width: 250px;
+  background-color: #2c3e50;
+  color: white;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  transition: transform 0.3s ease;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.sidebar.closed {
+  transform: translateX(-100%);
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.sidebar h2 {
+  margin-top: 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar ul li {
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  background-color: #34495e;
+  transition: background-color 0.3s;
+}
+
+.sidebar ul li:hover {
+  background-color: #1abc9c;
+}
+
+.sidebar button {
+  width: 100%;
+  padding: 10px;
+  background-color: #1abc9c;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 15px;
+  transition: background-color 0.3s;
+}
+
+.sidebar button:hover {
+  background-color: #16a085;
+}
+
+.sidebar .btn-delete-all {
+  background-color: #e74c3c;
+}
+
+.sidebar .btn-delete-all:hover {
+  background-color: #c0392b;
+}
+
+/* Main content styling */
+.main-content {
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.chat-window {
+  flex-grow: 1;
+  background-color: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-window p {
+  margin: 10px 0;
+  white-space: pre-wrap;
+}
+
+/* Styling for messages */
+.message {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  max-width: 60%;
+}
+
+.message.user {
+  align-self: flex-end;
+  text-align: right;
+}
+
+.message.ai {
+  align-self: flex-start;
+  text-align: left;
+}
+
+.message p {
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.message.user p {
+  background-color: #1abc9c;
   color: white;
+  border-radius: 10px 10px 0 10px;
 }
 
-.App-link {
-  color: #61dafb;
+.message.ai p {
+  background-color: #ecf0f1;
+  color: #2c3e50;
+  border-radius: 10px 10px 10px 0;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Form styling */
+.form-group {
+  display: flex;
+  margin-top: 10px;
+}
+
+.form-group input[type="text"] {
+  flex-grow: 1;
+  padding: 15px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 30px;
+  margin-right: 10px;
+  outline: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-group button {
+  padding: 15px 20px;
+  background-color: #1abc9c;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  outline: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-group button:hover {
+  background-color: #16a085;
+}
+
+/* Toggle sidebar button */
+#toggle-sidebar {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+  background-color: #1abc9c;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s;
+}
+
+#toggle-sidebar:hover {
+  background-color: #16a085;
 }

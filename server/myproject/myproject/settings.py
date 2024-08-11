@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     'rest_framework',
     'PaLM2',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -49,7 +50,19 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+        'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+
+# OR use this to allow all origins (less secure)
+# CORS_ALLOW_ALL_ORIGINS = True
+
+
+
+
 
 ROOT_URLCONF = "myproject.urls"
 
