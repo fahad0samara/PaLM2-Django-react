@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { FaBars, FaTimes, FaTrashAlt, FaComments } from "react-icons/fa";
 import "./App.css";
 
 function App() {
@@ -9,6 +10,8 @@ function App() {
   });
   const [currentConversation, setCurrentConversation] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     localStorage.setItem("conversations", JSON.stringify(conversations));
@@ -16,26 +19,36 @@ function App() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
 
-   fetch("http://127.0.0.1:8000/api/generate-text/", {
-     method: "POST",
-     headers: {
-       "Content-Type": "application/x-www-form-urlencoded",
-       "X-CSRFToken": getCookie("csrftoken"),
-     },
-     body: `prompt=${encodeURIComponent(prompt)}`,
-   })
-     .then((response) => response.json())
-     .then((data) => {
-       const responseText = data.text || "No text generated";
-       const newConversation = { prompt, response: responseText };
-       setConversations([...conversations, newConversation]);
-       setCurrentConversation(newConversation);
-       setPrompt("");
-     })
-     .catch((error) => {
-       console.error("Error:", error);
-     });
+    fetch("http://127.0.0.1:8000/api/generate-text/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "X-CSRFToken": getCookie("csrftoken"),
+      },
+      body: `prompt=${encodeURIComponent(prompt)}`,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const responseText = data.text || "No text generated";
+        const newConversation = { prompt, response: responseText };
+        setConversations([...conversations, newConversation]);
+        setCurrentConversation(newConversation);
+        setPrompt("");
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        setError("An error occurred. Please try again.");
+      })
+      .finally(() => {
+        setLoading(false);
+        // Clear error message after 5 seconds
+        if (error) {
+          setTimeout(() => setError(null), 5000);
+        }
+      });
   };
 
   const handleDeleteAll = () => {
@@ -61,7 +74,7 @@ function App() {
         className="btn-icon"
         onClick={handleSidebarToggle}
       >
-        <i className={`fas fa-${sidebarOpen ? "times" : "bars"}`}></i>
+        {sidebarOpen ? <FaTimes /> : <FaBars />}
       </button>
       <div className={`sidebar ${sidebarOpen ? "" : "closed"}`}>
         <button
@@ -69,7 +82,7 @@ function App() {
           className="btn-icon"
           onClick={() => setCurrentConversation(null)}
         >
-          <i className="fas fa-comments"></i> New Chat
+          <FaComments /> New Chat
         </button>
         <h2>Conversation History</h2>
         <ul id="history">
@@ -77,13 +90,13 @@ function App() {
             <li key={index} onClick={() => setCurrentConversation(conv)}>
               {getConversationTitle(conv.prompt)}
               <button
-                className="btn-icon"
+                className="btn-icon-delete"
                 onClick={(e) => {
                   e.stopPropagation();
                   setConversations(conversations.filter((_, i) => i !== index));
                 }}
               >
-                <i className="fas fa-trash-alt"></i>
+                <FaTrashAlt />
               </button>
             </li>
           ))}
@@ -93,11 +106,13 @@ function App() {
           className="btn-icon btn-delete-all"
           onClick={handleDeleteAll}
         >
-          <i className="fas fa-trash-alt"></i> Delete All History
+          <FaTrashAlt /> Delete All History
         </button>
       </div>
       <div className="main-content">
         <div className="chat-window">
+          {loading && <p>Loading...</p>}
+          {error && <p className="error">{error}</p>}
           {currentConversation ? (
             <>
               <div className="message user">
@@ -108,7 +123,7 @@ function App() {
               </div>
             </>
           ) : (
-            <p>Start a new conversation!</p>
+            !loading && <p>Start a new conversation!</p>
           )}
         </div>
         <form id="text-form" onSubmit={handleSubmit}>
@@ -122,7 +137,9 @@ function App() {
               placeholder="Type your message..."
               required
             />
-            <button type="submit">Send</button>
+            <button type="submit" disabled={loading}>
+              Send
+            </button>
           </div>
         </form>
       </div>
@@ -130,7 +147,7 @@ function App() {
   );
 }
 
-// Function to get CSRF token (same as in original script)
+// Function to get CSRF token
 function getCookie(name) {
   let cookieValue = null;
   if (document.cookie && document.cookie !== "") {

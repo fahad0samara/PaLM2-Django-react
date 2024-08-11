@@ -54,7 +54,7 @@ body, html, #root, .App {
 .sidebar button {
   width: 100%;
   padding: 10px;
-  background-color: #1abc9c;
+  background-color: #1abc6b;
   color: white;
   border: none;
   border-radius: 5px;
@@ -62,9 +62,15 @@ body, html, #root, .App {
   margin-bottom: 15px;
   transition: background-color 0.3s;
 }
+.sidebar .btn-icon-delete {
+  font-size: 20px;
+  margin-right: 10px;
+  background-color: #e73c3c;
+
+}
 
 .sidebar button:hover {
-  background-color: #16a085;
+  background-color: #ea0b0b;
 }
 
 .sidebar .btn-delete-all {
@@ -175,7 +181,7 @@ body, html, #root, .App {
   top: 10px;
   left: 10px;
   z-index: 1000;
-  background-color: #1abc9c;
+  background-color: #9cbc1a;
   color: white;
   border: none;
   border-radius: 5px;
@@ -187,5 +193,20 @@ body, html, #root, .App {
 }
 
 #toggle-sidebar:hover {
-  background-color: #16a085;
+  background-color: #7ba016;
+
+}
+
+
+.error-message {
+  color: #dc3545;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+.error {
+  color: red;
+  font-weight: bold;
 }

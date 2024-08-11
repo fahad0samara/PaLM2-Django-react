@@ -4,7 +4,6 @@ from rest_framework import status
 from django.conf import settings
 import google.generativeai as genai
 from .serializers import GenerateTextSerializer
-from django.shortcuts import render
 
 class GenerateTextView(APIView):
     def post(self, request):
@@ -17,9 +16,13 @@ class GenerateTextView(APIView):
                 response = model.generate_content(prompt)
                 return Response({'text': response.text}, status=status.HTTP_200_OK)
             except Exception as e:
-                return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                # Provide a clear error message
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    
+           
+        
 
-
-
+        
