@@ -4,6 +4,10 @@
 
 This project is a chat application built with React and Django. It allows users to start conversations and interact with an AI model using text prompts. The application supports storing conversation history and has a responsive design with a sidebar for easy navigation.
 
+![Screenshot 2024-08-11 092646](https://github.com/user-attachments/assets/bd6760b1-c29d-4715-83a3-da55346ddb55)
+
+
+
 ### Features
 
 - **Start New Conversations:** Initiate new chat sessions and interact with the AI model.
